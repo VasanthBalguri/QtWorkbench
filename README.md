@@ -11,7 +11,7 @@ steps:
 
 hope it should work..
 
-#note:
+# note:
 
 * Although it has .pro file for qmake, it is configured as per Ubuntu
 * Need to test CMake build on windows to confirm cross compatibility
