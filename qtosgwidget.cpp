@@ -27,7 +27,7 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         manipulator->setAllowThrow( false );
         this->setMouseTracking(true);
         _mViewer->setCameraManipulator(manipulator);
-
+/*
         osg::ref_ptr<osg::Cylinder> cylinder    = new osg::Cylinder( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f, 0.5f );
         osg::ref_ptr<osg::ShapeDrawable> sd = new osg::ShapeDrawable( cylinder );
         sd->setColor( osg::Vec4( 0.8f, 0.5f, 0.2f, 1.f ) );
@@ -36,11 +36,11 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         osg::ref_ptr<osg::Group> root = new osg::Group();
 
         root->addChild(geode);
-
+*/
         _mViewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
 
-        _mViewer->setSceneData(root);
+        //_mViewer->setSceneData(root);
         _mViewer->realize();
         }
         catch(std::exception e)
@@ -50,7 +50,16 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
 
       }
 
+void QtOSGWidget::addScene(osg::ref_ptr<osg::Group> root)
+{
+    _mViewer->setSceneData(root);
+}
 
+osg::ref_ptr<osg::Group> QtOSGWidget::getScene()
+{
+   osg::ref_ptr<osg::Group> root = dynamic_cast<osg::Group*>(_mViewer->getSceneData());
+   return root;
+}
   void QtOSGWidget::setScale(qreal X, qreal Y)
   {
       m_scaleX = X;
@@ -72,12 +81,13 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
   }
 
   void QtOSGWidget::initializeGL(){
-      osg::ref_ptr<osg::Group> geode = dynamic_cast<osg::Group*>(_mViewer->getSceneData());
-     osg::ref_ptr<osg::StateSet> stateSet = geode->getOrCreateStateSet();
+    //none as of now
+      /* osg::ref_ptr<osg::Group> root = dynamic_cast<osg::Group*>(_mViewer->getSceneData());
+     osg::ref_ptr<osg::StateSet> stateSet = root->getOrCreateStateSet();
       osg::ref_ptr<osg::Material> material = new osg::Material;
       material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
       stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
-      stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
+      stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );*/
   }
 
   void QtOSGWidget::mouseMoveEvent(QMouseEvent* event)
@@ -194,4 +204,20 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
      vColor[3] = ((float)a)/255.0f;
 
     _mViewer->getCamera()->setClearColor(vColor);
+  }
+
+  void QtOSGWidget::openScene(std::string path)
+  {
+      osg::ref_ptr<osg::Node> loadedModel = osgDB::readRefNodeFile(path);
+      if(loadedModel == NULL)
+      {
+         std::cout<<"failed to load model";
+         throw std::exception();
+       }
+
+       osg::ref_ptr<osg::Group> root = new osg::Group();
+      root->addChild(loadedModel);
+              //
+
+       _mViewer->setSceneData(root);
   }

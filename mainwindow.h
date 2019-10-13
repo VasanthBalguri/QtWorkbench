@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileDialog>
 #include<vector>
 
 namespace Ui {
@@ -26,9 +27,11 @@ public slots:
     void changedR(int);
     void changedG(int);
     void changedB(int);
+    void createFileDialog();
 
 signals:
     void colorChanged(QColor);
+    void openFile(std::string);
 };
 
 #endif // MAINWINDOW_H

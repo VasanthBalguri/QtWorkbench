@@ -91,6 +91,9 @@
       </item>
       <item row="0" column="3">
        <widget class="QSlider" name="red_slider">
+        <property name="maximum">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -98,6 +101,9 @@
       </item>
       <item row="1" column="3">
        <widget class="QSlider" name="green_slider">
+        <property name="maximum">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -105,6 +111,9 @@
       </item>
       <item row="2" column="3">
        <widget class="QSlider" name="blue_slider">
+        <property name="maximum">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -123,26 +132,19 @@
      <height>30</height>
     </rect>
    </property>
+   <widget class="QMenu" name="fileMenu">
+    <property name="title">
+     <string>Fi&amp;le</string>
+    </property>
+    <addaction name="actionOpen"/>
+   </widget>
+   <addaction name="fileMenu"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open</string>
    </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

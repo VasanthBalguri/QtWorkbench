@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qtosgwidget.h"
+#include "osghelper.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,10 +14,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(qOsg,SIGNAL(orientationChanged(std::vector<double>)),this,SLOT(changedOrientation(std::vector<double>)));
     connect(this,SIGNAL(colorChanged(QColor)),qOsg,SLOT(changedColor(QColor)));
+    connect(this,SIGNAL(openFile(std::string)),qOsg,SLOT(openScene(std::string)));
 
     connect(ui->red_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedR(int)));
     connect(ui->green_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedG(int)));
     connect(ui->blue_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedB(int)));
+    connect(ui->actionOpen,SIGNAL(triggered(bool)),this,SLOT(createFileDialog()));
+
+
+    //qOsg->addScene(createScene());
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +48,7 @@ void MainWindow::changedOrientation(std::vector<double> values)
 void MainWindow::changedR(int value)
 {
     _color.setRed(value);
-
+    _color.setAlpha(255);
     emit colorChanged(_color);
 }
 
@@ -50,13 +56,28 @@ void MainWindow::changedR(int value)
 void MainWindow::changedG(int value)
 {
     _color.setGreen(value);
-
+    _color.setAlpha(255);
     emit colorChanged(_color);
 }
 
 void MainWindow::changedB(int value)
 {
     _color.setBlue(value);
-
+    _color.setAlpha(255);
     emit colorChanged(_color);
+}
+
+void MainWindow::createFileDialog()
+{
+    QFileDialog fileDialog(this);
+
+    fileDialog.setFileMode(QFileDialog::AnyFile);
+    fileDialog.setViewMode(QFileDialog::Detail);
+
+    QStringList fileNames;
+    if (fileDialog.exec())
+        fileNames = fileDialog.selectedFiles();
+
+     QString filePath = fileNames.first();
+    emit openFile(std::string(filePath.toUtf8().constData()));
 }

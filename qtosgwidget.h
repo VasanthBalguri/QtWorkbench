@@ -36,7 +36,10 @@ private:
   qreal m_scaleX, m_scaleY;
 
 public:
-  QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent = 0);
+  QtOSGWidget(qreal scaleX = 1, qreal scaleY = 1, QWidget* parent = 0);
+
+  void addScene(osg::ref_ptr<osg::Group> root);
+  osg::ref_ptr<osg::Group> getScene();
 
   virtual ~QtOSGWidget(){}
 
@@ -45,6 +48,7 @@ public:
   Q_OBJECT
 public slots:
     void changedColor(QColor color);
+    void openScene(std::string path);
 signals:
     void orientationChanged(std::vector<double>);
 
