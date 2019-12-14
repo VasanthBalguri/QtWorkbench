@@ -5,6 +5,9 @@
 #include <QFileDialog>
 #include<vector>
 
+#include "qtosgwidget.h"
+#include "osghelper.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -20,6 +23,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QColor _color;
+    QtOSGWidget* qOsg;
 
 public slots:
 
@@ -28,6 +32,7 @@ public slots:
     void changedG(int);
     void changedB(int);
     void createFileDialog();
+    void updateBottle();
 
 signals:
     void colorChanged(QColor);

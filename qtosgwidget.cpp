@@ -1,6 +1,6 @@
 #include "qtosgwidget.h"
 
-
+#include <iostream>
 
 QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
       : QOpenGLWidget(parent)
@@ -27,20 +27,11 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         manipulator->setAllowThrow( false );
         this->setMouseTracking(true);
         _mViewer->setCameraManipulator(manipulator);
-/*
-        osg::ref_ptr<osg::Cylinder> cylinder    = new osg::Cylinder( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f, 0.5f );
-        osg::ref_ptr<osg::ShapeDrawable> sd = new osg::ShapeDrawable( cylinder );
-        sd->setColor( osg::Vec4( 0.8f, 0.5f, 0.2f, 1.f ) );
-        osg::ref_ptr<osg::Geode> geode = new osg::Geode();
-        geode->addDrawable(sd);
-        osg::ref_ptr<osg::Group> root = new osg::Group();
 
-        root->addChild(geode);
-*/
+        osg::ref_ptr<osg::Group> root = new osg::Group;
+        _mViewer->setSceneData(root);
         _mViewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
-
-        //_mViewer->setSceneData(root);
         _mViewer->realize();
         }
         catch(std::exception e)
@@ -50,7 +41,7 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
 
       }
 
-void QtOSGWidget::addScene(osg::ref_ptr<osg::Group> root)
+void QtOSGWidget::setScene(osg::ref_ptr<osg::Group> root)
 {
     _mViewer->setSceneData(root);
 }
@@ -60,7 +51,8 @@ osg::ref_ptr<osg::Group> QtOSGWidget::getScene()
    osg::ref_ptr<osg::Group> root = dynamic_cast<osg::Group*>(_mViewer->getSceneData());
    return root;
 }
-  void QtOSGWidget::setScale(qreal X, qreal Y)
+
+void QtOSGWidget::setScale(qreal X, qreal Y)
   {
       m_scaleX = X;
       m_scaleY = Y;
@@ -81,36 +73,55 @@ osg::ref_ptr<osg::Group> QtOSGWidget::getScene()
   }
 
   void QtOSGWidget::initializeGL(){
-    //none as of now
-      /* osg::ref_ptr<osg::Group> root = dynamic_cast<osg::Group*>(_mViewer->getSceneData());
-     osg::ref_ptr<osg::StateSet> stateSet = root->getOrCreateStateSet();
-      osg::ref_ptr<osg::Material> material = new osg::Material;
-      material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
-      stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
-      stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );*/
+
+      //basic shader setup
+       osg::ref_ptr<osg::StateSet> stateSet = this->getScene()->getOrCreateStateSet();
+       osg::ref_ptr<osg::Program> program = new osg::Program;
+
+       osg::ref_ptr<osg::Shader> vertShader = new osg::Shader(osg::Shader::VERTEX);
+       if (!vertShader->loadShaderSourceFromFile("../shaders/myShader.vert"))
+           std::cerr << "Could not read VERTEX shader from file" << std::endl;
+       program->addShader(vertShader);
+
+        osg::ref_ptr<osg::Shader> geomShader = new osg::Shader(osg::Shader::GEOMETRY);
+       if (!geomShader->loadShaderSourceFromFile("../shaders/myShader.geom"))
+           std::cerr << "Could not read GEOM shader from file" << std::endl;
+       program->addShader(geomShader);
+
+       osg::ref_ptr<osg::Shader> fragShader = new osg::Shader(osg::Shader::FRAGMENT);
+       if (!fragShader->loadShaderSourceFromFile("../shaders/myShader.frag"))
+           std::cerr << "Could not read FRAGMENT shader from file" << std::endl;
+       program->addShader(fragShader);
+
+       stateSet->setAttributeAndModes(program.get(), osg::StateAttribute::ON);
+       stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+
+       osg::Uniform* modelViewProjectionMatrix = new osg::Uniform(osg::Uniform::FLOAT_MAT4, "osg_ModelViewProjectionMatrix");
+       modelViewProjectionMatrix->setUpdateCallback(new ModelViewProjectionMatrixCallback(_mViewer->getCamera()));
+       stateSet->addUniform(modelViewProjectionMatrix);
   }
 
   void QtOSGWidget::mouseMoveEvent(QMouseEvent* event)
   {
       this->getEventQueue()->mouseMotion(event->x()*m_scaleX, event->y()*m_scaleY);
-      osg::Matrixd viewMatirx = _mViewer->getCamera()->getViewMatrix();
+      osg::Matrixd viewMatrix = _mViewer->getCamera()->getViewMatrix();
       osg::Vec3d center;
       osg::Vec3d eye;
       osg::Vec3d up;
-      viewMatirx.getLookAt(eye,center,up);
+      viewMatrix.getLookAt(eye,center,up);
       std::vector<double> values;
 
-      values.push_back(eye.x());
-      values.push_back(eye.y());
-      values.push_back(eye.z());
+          values.push_back(eye.x());
+          values.push_back(eye.y());
+          values.push_back(eye.z());
 
-      values.push_back(center.x());
-      values.push_back(center.y());
-      values.push_back(center.z());
+          values.push_back(center.x());
+          values.push_back(center.y());
+          values.push_back(center.z());
 
-      values.push_back(up.x());
-      values.push_back(up.y());
-      values.push_back(up.z());
+          values.push_back(up.x());
+          values.push_back(up.y());
+          values.push_back(up.z());
 
       emit orientationChanged(values);
   }
@@ -159,11 +170,11 @@ osg::ref_ptr<osg::Group> QtOSGWidget::getScene()
       osgGA::GUIEventAdapter::ScrollingMotion motion = delta > 0 ?
                   osgGA::GUIEventAdapter::SCROLL_UP : osgGA::GUIEventAdapter::SCROLL_DOWN;
       this->getEventQueue()->mouseScroll(motion);
-    osg::Matrixd viewMatirx = _mViewer->getCamera()->getViewMatrix();
+    osg::Matrixd viewMatrix = _mViewer->getCamera()->getViewMatrix();
     osg::Vec3d center;
     osg::Vec3d eye;
     osg::Vec3d up;
-    viewMatirx.getLookAt(eye,center,up);
+    viewMatrix.getLookAt(eye,center,up);
     std::vector<double> values;
 
     values.push_back(eye.x());

@@ -1,13 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "qtosgwidget.h"
-#include "osghelper.h"
+
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    QtOSGWidget* qOsg = new QtOSGWidget(1,1,this);
+    qOsg = new QtOSGWidget(1,1,this);
     ui->setupUi(this);
     ui->verticalLayout_2->addWidget(qOsg);
 
@@ -16,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,SIGNAL(colorChanged(QColor)),qOsg,SLOT(changedColor(QColor)));
     connect(this,SIGNAL(openFile(std::string)),qOsg,SLOT(openScene(std::string)));
 
+    connect(ui->height_value,SIGNAL(valueChanged(double)),this,SLOT(updateBottle()));
+    connect(ui->width_value,SIGNAL(valueChanged(double)),this,SLOT(updateBottle()));
+    connect(ui->thickness_value,SIGNAL(valueChanged(double)),this,SLOT(updateBottle()));
     connect(ui->red_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedR(int)));
     connect(ui->green_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedG(int)));
     connect(ui->blue_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedB(int)));
@@ -80,4 +83,21 @@ void MainWindow::createFileDialog()
 
      QString filePath = fileNames.first();
     emit openFile(std::string(filePath.toUtf8().constData()));
+}
+
+void MainWindow::updateBottle()
+{
+    osg::ref_ptr<osg::Group> root;
+    osg::ref_ptr<osg::Geode> bottle;
+
+    double mythickness = ui->thickness_value->value();
+    double mywidth = ui->width_value->value();
+    double myheight = ui->height_value->value();
+    osg::Vec3 myColor = osg::Vec3( 1.0f, 1.0f, 1.0f );
+
+
+    qOsg->getScene()->removeChild(0,1);
+    qOsg->getScene()->addChild(createBottle(mywidth,myheight,mythickness,myColor/*,viewMatrix*/));
+
+
 }

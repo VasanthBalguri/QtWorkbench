@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    qtosgwidget.cpp
+    qtosgwidget.cpp \
+    osghelper.cpp
 
 HEADERS += \
         mainwindow.h \
-    qtosgwidget.h
+    qtosgwidget.h \
+    osghelper.h
 
 FORMS += \
         mainwindow.ui
@@ -39,4 +41,4 @@ unix:!macx: LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -losg -losgDB -lo
 
 INCLUDEPATH += $$PWD/../../../usr/include/osg
 DEPENDPATH += $$PWD/../../../usr/include/osg
-
+INCLUDEPATH += /usr/include/oce
