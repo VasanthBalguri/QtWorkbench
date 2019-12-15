@@ -18,8 +18,8 @@ hope it should work..
 * There is feature to open .osg files
 
 # Screenshots
-
-
+![Alt text](/screenshots/sample1.png?raw=true "Opencascade Bottle")
+![Alt text](/screenshots/sample2.png?raw=true "osg file")
 # note:
 
 * .pro file doesnt work as I was unable to configure the opencascade libraries
