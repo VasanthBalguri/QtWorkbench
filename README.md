@@ -11,7 +11,16 @@ steps:
 
 hope it should work..
 
+# Current usage
+
+* Added shaders to render the object
+* Added sources from Opencascade tutorial to create bottle(should be removed)
+* There is feature to open .osg files
+
+# Screenshots
+
+
 # note:
 
-* Although it has .pro file for qmake, it is configured as per Ubuntu
+* .pro file doesnt work as I was unable to configure the opencascade libraries
 * Need to test CMake build on windows to confirm cross compatibility
