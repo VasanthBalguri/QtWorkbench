@@ -1,5 +1,6 @@
 ﻿#include "osghelper.h"
 
+using namespace osg;
 
 //need to be removed
 ref_ptr<Group> createScene()
@@ -72,6 +73,7 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
     //Add edge to fillet algorithm
     mkFillet.Add(myThickness / 12., anEdge);
     anEdgeExplorer.Next();
+
   }
 
   myBody = mkFillet.Shape();
@@ -178,7 +180,7 @@ osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const o
     // create one osg primitive set
     osg::ref_ptr<osg::DrawElementsUInt> triangleStrip = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES, 0);
 
-    osg::ref_ptr<osg::Vec3Array> normalArray = new osg::Vec3Array;
+    //osg::ref_ptr<osg::Vec3Array> normalArray = new osg::Vec3Array;
 
     unsigned int noOfTriangles = 0;
 
@@ -193,10 +195,6 @@ osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const o
         BRepTools::Clean(shape);
 
         //_healShape(shape);
-
-        #ifdef _LOG_DEBUG_
-            std::cout << std::endl << "Building a Mesh !!" ;
-        #endif
 
         /// call to incremental mesh on this shape
         /// \todo not sure why this 1 is passed. Its called deflection BTW
@@ -258,11 +256,11 @@ osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const o
                     gp_XYZ aPnt2 = (triangulation->Nodes())(v2).XYZ();
                     gp_XYZ aPnt3 = (triangulation->Nodes())(v3).XYZ();
 
-                    gp_XYZ aV12 = aPnt2 - aPnt1;
-                    gp_XYZ aV23 = aPnt3 - aPnt2;
-                    gp_XYZ aNor = aV12^aV23;
+//                    gp_XYZ aV12 = aPnt2 - aPnt1;
+//                    gp_XYZ aV23 = aPnt3 - aPnt2;
+//                    gp_XYZ aNor = aV12^aV23;
 
-                    normalArray->push_back(osg::Vec3(aNor.X(),aNor.Y(),aNor.Z()));
+//                    normalArray->push_back(osg::Vec3(aNor.X(),aNor.Y(),aNor.Z()));
 
 
                     triangleStrip->push_back(index + v1 - 1);
@@ -278,34 +276,59 @@ osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const o
         #endif
 
         geom->setVertexArray(vertexList.get());
-        geom->setVertexAttribArray(0, geom->getVertexArray(), osg::Array::BIND_PER_VERTEX);
+        //geom->setVertexAttribArray(0, geom->getVertexArray(), osg::Array::BIND_PER_VERTEX);
         geom->setColorArray(colorList.get(), colorBinding);
-        geom->setVertexAttribArray(2, geom->getColorArray(), osg::Array::BIND_OVERALL);
-       /* osg::ref_ptr<osg::StateSet> stateSet = geom->getOrCreateStateSet();
-        osg::ref_ptr<osg::Program> program = new osg::Program;
-
-        osg::ref_ptr<osg::Shader> vertShader = new osg::Shader(osg::Shader::VERTEX);
-        if (!vertShader->loadShaderSourceFromFile("../shaders/myShader.vert"))
-            std::cerr << "Could not read VERTEX shader from file" << std::endl;
-        program->addShader(vertShader);
-
-        osg::ref_ptr<osg::Shader> fragShader = new osg::Shader(osg::Shader::FRAGMENT);
-        if (!fragShader->loadShaderSourceFromFile("../shaders/myShader.frag"))
-            std::cerr << "Could not read FRAGMENT shader from file" << std::endl;
-        program->addShader(fragShader);
-
-        stateSet->setAttributeAndModes(program.get(), osg::StateAttribute::ON);*/
-
-
-        #ifdef _LOG_DEBUG_
-            std::cout << "Adding Primitive set" << std::endl;
-        #endif
-        geom->setNormalArray(normalArray.get());
-        geom->setVertexAttribArray(1, geom->getNormalArray(), osg::Array::BIND_PER_VERTEX);
+        //geom->setVertexAttribArray(2, geom->getColorArray(), osg::Array::BIND_OVERALL);
+        //geom->setNormalArray(normalArray.get());
+        //geom->setVertexAttribArray(1, geom->getNormalArray(), osg::Array::BIND_PER_VERTEX);
         geom->addPrimitiveSet(triangleStrip.get());
+        osgUtil::SmoothingVisitor::smooth(*geom);
+        osgUtil::SmoothingVisitor::  smooth(*geom,osg::PI/6.0);
     }
 
     return geom;
+}
+
+osg::ref_ptr<osg::Geode> readStepFile(std::string path)
+{
+    STEPControl_Reader aReader;
+    TopoDS_Shape aShape;
+    gp_Trsf transform;
+    aReader.ReadFile(path.c_str());
+
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+
+
+    Standard_Integer nbr = aReader.NbRootsForTransfer();
+
+    for (Standard_Integer n = 1; n<= nbr; n++) {
+        aReader.TransferRoot(n);
+    }
+
+    // Collecting resulting entities
+    Standard_Integer nbs = aReader.NbShapes();
+    if (nbs == 0) {
+
+    }
+    else
+    {
+        for (Standard_Integer i=1; i<=nbs; i++) {
+            aShape = aReader.Shape(i);
+
+            osg::ref_ptr<osg::Geometry> geom = createGeometryFromShape(aShape,osg::Vec3f(1.0,1.0,1.0),transform);
+            osg::ref_ptr<osg::Drawable> sd = (osg::ref_ptr<osg::Drawable>)geom->asDrawable();
+
+            geode->addDrawable(sd);
+        }
+    }
+
+    osg::ref_ptr<osg::StateSet> stateSet = geode->getOrCreateStateSet();
+    osg::ref_ptr<osg::Material> material = new osg::Material;
+    material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
+    stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
+    stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
+
+    return geode;
 }
 
 //must be clubbed as a single class instead of helper functions
@@ -313,26 +336,13 @@ osg::ref_ptr<osg::Geode> createBottle(double width,double height,double thicknes
 {
     gp_Trsf transform;
 
-//    transform.SetValues((Standard_Real)viewMatrix(0,0),
-//                        (Standard_Real)viewMatrix(0,1),
-//                        (Standard_Real)viewMatrix(0,2),
-//                        (Standard_Real)viewMatrix(0,3),
-//                        (Standard_Real)viewMatrix(1,0),
-//                        (Standard_Real)viewMatrix(1,1),
-//                        (Standard_Real)viewMatrix(1,2),
-//                        (Standard_Real)viewMatrix(1,3),
-//                        (Standard_Real)viewMatrix(2,0),
-//                        (Standard_Real)viewMatrix(2,1),
-//                        (Standard_Real)viewMatrix(2,2),
-//                        (Standard_Real)viewMatrix(2,3));
     TopoDS_Shape shape = MakeBottle((Standard_Real)width,(Standard_Real)height,(Standard_Real)thickness);
     osg::ref_ptr<osg::Geometry> geom = createGeometryFromShape(shape,geomColor,transform);
     osg::ref_ptr<osg::Drawable> sd = (osg::ref_ptr<osg::Drawable>)geom->asDrawable();
     osg::ref_ptr<osg::Geode> geode = new osg::Geode();
-    osg::ref_ptr<osg::Group> root = new osg::Group();
 
     geode->addDrawable(sd);
-    root->addChild(geode);
+
     osg::ref_ptr<osg::StateSet> stateSet = geode->getOrCreateStateSet();
     osg::ref_ptr<osg::Material> material = new osg::Material;
     material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );

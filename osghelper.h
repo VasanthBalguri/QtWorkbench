@@ -1,6 +1,7 @@
 #ifndef OSGHELPER_H
 #define OSGHELPER_H
 
+//osg includes
 #include <osg/ref_ptr>
 #include <osgViewer/GraphicsWindow>
 #include <osgViewer/Viewer>
@@ -11,6 +12,7 @@
 #include <osgGA/EventQueue>
 #include <osgGA/TrackballManipulator>
 #include <osgDB/ReadFile>
+#include <osgUtil/SmoothingVisitor>
 
 //oce includes
 #include <BRep_Tool.hxx>
@@ -23,7 +25,6 @@
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepFilletAPI_MakeFillet.hxx>
-
 #include <BRepLib.hxx>
 
 #include <BRepOffsetAPI_MakeThickSolid.hxx>
@@ -75,16 +76,53 @@
 #include <Poly_Triangulation.hxx>
 #include <Poly_Array1OfTriangle.hxx>
 
+#include <STEPControl_Writer.hxx>
+#include <STEPControl_Reader.hxx>
+#include <StepData_StepModel.hxx>
 
-using namespace osg;
+# include <STEPConstruct_Styles.hxx>
+# include <STEPConstruct.hxx>
+# include <StepVisual_StyledItem.hxx>
+# include <StepShape_ShapeRepresentation.hxx>
+# include <StepVisual_PresentationStyleByContext.hxx>
+# include <StepVisual_StyleContextSelect.hxx>
+# include <StepVisual_PresentationStyleByContext.hxx>
+# include <StepRepr_RepresentedDefinition.hxx>
+# include <StepShape_ShapeDefinitionRepresentation.hxx>
+# include <StepRepr_CharacterizedDefinition.hxx>
+# include <StepRepr_ProductDefinitionShape.hxx>
+# include <StepRepr_AssemblyComponentUsage.hxx>
+# include <StepRepr_AssemblyComponentUsage.hxx>
+# include <StepRepr_SpecifiedHigherUsageOccurrence.hxx>
+# include <StepBasic_Product.hxx>
+# include <StepBasic_Product.hxx>
+# include <StepBasic_ProductDefinition.hxx>
+# include <StepBasic_ProductDefinition.hxx>
+# include <StepBasic_ProductDefinitionFormation.hxx>
 
-ref_ptr<Group> createScene();
+osg::ref_ptr<osg::Group> createScene();
 TopoDS_Shape
 MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
            const Standard_Real myThickness);
-ref_ptr<Geometry> createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geomColor, gp_Trsf& transformation);
-ref_ptr<Group> readSceneFile(std::string filePath);
-ref_ptr<Geode> createBottle(double width, double height, double thickness, const Vec3f &geomColor/*, const Matrixd &viewMatrix*/);
+osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geomColor, gp_Trsf& transformation);
+osg::ref_ptr<osg::Group> readSceneFile(std::string filePath);
+osg::ref_ptr<osg::Geode> createBottle(double width, double height, double thickness, const osg::Vec3f &geomColor/*, const Matrixd &viewMatrix*/);
+osg::ref_ptr<osg::Geode> readStepFile(std::string path);
+/*namespace OsgOpencascadeHelper{
 
+class Shape{
+
+    Shape(TopoDS_Shape shape)
+    {
+
+    }
+
+};
+
+class Assembly{
+
+};
+
+}*/
 
 #endif // OSGHELPER_H

@@ -40,7 +40,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="4">
        <widget class="QSlider" name="red_slider">
         <property name="maximum">
          <number>255</number>
@@ -50,7 +50,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="1" column="4">
        <widget class="QSlider" name="green_slider">
         <property name="maximum">
          <number>255</number>
@@ -60,7 +60,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
+      <item row="2" column="4">
        <widget class="QSlider" name="blue_slider">
         <property name="maximum">
          <number>255</number>
@@ -167,12 +167,18 @@
      <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionsave"/>
    </widget>
    <addaction name="fileMenu"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
     <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="actionsave">
+   <property name="text">
+    <string>save</string>
    </property>
   </action>
  </widget>

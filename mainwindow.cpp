@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(qOsg,SIGNAL(orientationChanged(std::vector<double>)),this,SLOT(changedOrientation(std::vector<double>)));
     connect(this,SIGNAL(colorChanged(QColor)),qOsg,SLOT(changedColor(QColor)));
     connect(this,SIGNAL(openFile(std::string)),qOsg,SLOT(openScene(std::string)));
+    connect(this,SIGNAL(saveFile(std::string)),qOsg,SLOT(saveScene(std::string)));
 
     connect(ui->height_value,SIGNAL(valueChanged(double)),this,SLOT(updateBottle()));
     connect(ui->width_value,SIGNAL(valueChanged(double)),this,SLOT(updateBottle()));
@@ -23,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->green_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedG(int)));
     connect(ui->blue_slider,SIGNAL(sliderMoved(int)),this,SLOT(changedB(int)));
     connect(ui->actionOpen,SIGNAL(triggered(bool)),this,SLOT(createFileDialog()));
-
+    connect(ui->actionsave,SIGNAL(triggered(bool)),this,SLOT(saveFileDialog()));
 
     //qOsg->addScene(createScene());
 }
@@ -83,6 +84,22 @@ void MainWindow::createFileDialog()
 
      QString filePath = fileNames.first();
     emit openFile(std::string(filePath.toUtf8().constData()));
+}
+
+void MainWindow::saveFileDialog()
+{
+    QFileDialog fileDialog(this);
+
+    fileDialog.setFileMode(QFileDialog::AnyFile);
+    fileDialog.setViewMode(QFileDialog::Detail);
+
+    QStringList fileNames;
+    if (fileDialog.exec())
+        fileNames = fileDialog.selectedFiles();
+
+     QString filePath = fileNames.first();
+
+     emit saveFile(std::string(filePath.toUtf8().constData()));
 }
 
 void MainWindow::updateBottle()

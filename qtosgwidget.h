@@ -21,7 +21,7 @@
 #include <osgGA/EventQueue>
 #include <osgGA/TrackballManipulator>
 #include <osgDB/ReadFile>
-
+#include <osgDB/WriteFile>
 #include <osg/LineWidth>
 #include <osg/Point>
 #include <osg/BlendFunc>
@@ -89,6 +89,8 @@ public:
 public slots:
     void changedColor(QColor color);
     void openScene(std::string path);
+    void saveScene(std::string path);
+
 signals:
     void orientationChanged(std::vector<double>);
 

@@ -5,6 +5,7 @@ project(Qtworkbench)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -12,7 +13,7 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 find_package(OCE REQUIRED)
-FIND_PACKAGE( OpenSceneGraph COMPONENTS osgDB osgGA osgViewer osg)
+FIND_PACKAGE( OpenSceneGraph COMPONENTS osgDB osgGA osgViewer osg osgUtil)
 
 include_directories(${OCE_INCLUDE_DIRS})
 

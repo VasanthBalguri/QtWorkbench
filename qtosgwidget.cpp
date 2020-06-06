@@ -1,5 +1,5 @@
 #include "qtosgwidget.h"
-
+#include "osghelper.h"
 #include <iostream>
 
 QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
@@ -12,7 +12,8 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
       {
 
         try{
-
+//        osg::setNotifyLevel(osg::WARN);
+//      osg::setNotifyHandler(new OsgLogger("mylog.txt"));
             //initialize camera
         osg::ref_ptr<osg::Camera> camera = new osg::Camera;
         camera->setViewport( this->x(), this->y(), this->width(), this->height() );
@@ -75,30 +76,31 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
   void QtOSGWidget::initializeGL(){
 
       //basic shader setup
-       osg::ref_ptr<osg::StateSet> stateSet = this->getScene()->getOrCreateStateSet();
-       osg::ref_ptr<osg::Program> program = new osg::Program;
+      // disabled shader as of now, but in essence this is how it will work
+//       osg::ref_ptr<osg::StateSet> stateSet = this->getScene()->getOrCreateStateSet();
+//       osg::ref_ptr<osg::Program> program = new osg::Program;
 
-       osg::ref_ptr<osg::Shader> vertShader = new osg::Shader(osg::Shader::VERTEX);
-       if (!vertShader->loadShaderSourceFromFile("../shaders/myShader.vert"))
-           std::cerr << "Could not read VERTEX shader from file" << std::endl;
-       program->addShader(vertShader);
+//       osg::ref_ptr<osg::Shader> vertShader = new osg::Shader(osg::Shader::VERTEX);
+//       if (!vertShader->loadShaderSourceFromFile("../shaders/myShader.vert"))
+//           std::cerr << "Could not read VERTEX shader from file" << std::endl;
+//       program->addShader(vertShader);
 
-        osg::ref_ptr<osg::Shader> geomShader = new osg::Shader(osg::Shader::GEOMETRY);
-       if (!geomShader->loadShaderSourceFromFile("../shaders/myShader.geom"))
-           std::cerr << "Could not read GEOM shader from file" << std::endl;
-       program->addShader(geomShader);
+//        osg::ref_ptr<osg::Shader> geomShader = new osg::Shader(osg::Shader::GEOMETRY);
+//       if (!geomShader->loadShaderSourceFromFile("../shaders/myShader.geom"))
+//           std::cerr << "Could not read GEOM shader from file" << std::endl;
+//       program->addShader(geomShader);
 
-       osg::ref_ptr<osg::Shader> fragShader = new osg::Shader(osg::Shader::FRAGMENT);
-       if (!fragShader->loadShaderSourceFromFile("../shaders/myShader.frag"))
-           std::cerr << "Could not read FRAGMENT shader from file" << std::endl;
-       program->addShader(fragShader);
+//       osg::ref_ptr<osg::Shader> fragShader = new osg::Shader(osg::Shader::FRAGMENT);
+//       if (!fragShader->loadShaderSourceFromFile("../shaders/myShader.frag"))
+//           std::cerr << "Could not read FRAGMENT shader from file" << std::endl;
+//       program->addShader(fragShader);
 
-       stateSet->setAttributeAndModes(program.get(), osg::StateAttribute::ON);
-       stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+//       stateSet->setAttributeAndModes(program.get(), osg::StateAttribute::ON);
+//       stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
 
-       osg::Uniform* modelViewProjectionMatrix = new osg::Uniform(osg::Uniform::FLOAT_MAT4, "osg_ModelViewProjectionMatrix");
-       modelViewProjectionMatrix->setUpdateCallback(new ModelViewProjectionMatrixCallback(_mViewer->getCamera()));
-       stateSet->addUniform(modelViewProjectionMatrix);
+//       osg::Uniform* modelViewProjectionMatrix = new osg::Uniform(osg::Uniform::FLOAT_MAT4, "osg_ModelViewProjectionMatrix");
+//       modelViewProjectionMatrix->setUpdateCallback(new ModelViewProjectionMatrixCallback(_mViewer->getCamera()));
+//       stateSet->addUniform(modelViewProjectionMatrix);
   }
 
   void QtOSGWidget::mouseMoveEvent(QMouseEvent* event)
@@ -219,7 +221,7 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 
   void QtOSGWidget::openScene(std::string path)
   {
-      osg::ref_ptr<osg::Node> loadedModel = osgDB::readRefNodeFile(path);
+      /*osg::ref_ptr<osg::Node> loadedModel = osgDB::readRefNodeFile(path);
       if(loadedModel == NULL)
       {
          std::cout<<"failed to load model";
@@ -228,7 +230,25 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 
        osg::ref_ptr<osg::Group> root = new osg::Group();
       root->addChild(loadedModel);
-              //
 
-       _mViewer->setSceneData(root);
+       _mViewer->setSceneData(root);*/
+
+      osg::ref_ptr<osg::Geode> loadedModel = readStepFile(path);
+      if(loadedModel == NULL)
+      {
+         std::cout<<"failed to load model";
+         throw std::exception();
+       }
+      osg::ref_ptr<osg::Group> root = new osg::Group();
+       root->addChild(loadedModel);
+
+      _mViewer->setSceneData(root);
+
+  }
+
+  void QtOSGWidget::saveScene(std::string path)
+  {
+      osg::ref_ptr<osg::Node> root = _mViewer->getSceneData();
+      osgDB::writeNodeFile(*root,path);
+
   }

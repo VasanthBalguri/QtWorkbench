@@ -32,11 +32,13 @@ public slots:
     void changedG(int);
     void changedB(int);
     void createFileDialog();
+    void saveFileDialog();
     void updateBottle();
 
 signals:
     void colorChanged(QColor);
     void openFile(std::string);
+    void saveFile(std::string);
 };
 
 #endif // MAINWINDOW_H

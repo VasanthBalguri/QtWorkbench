@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     qtosgwidget.cpp \
-    osghelper.cpp
+    osghelper.cpp\
+    osglogger.cpp
 
 HEADERS += \
         mainwindow.h \
     qtosgwidget.h \
-    osghelper.h
+    osghelper.h\
+    osglogger.h
 
 FORMS += \
         mainwindow.ui
