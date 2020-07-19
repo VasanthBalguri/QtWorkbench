@@ -1,3 +1,4 @@
 bin/*
 avatar.osg
 test.osg
+Makefile
