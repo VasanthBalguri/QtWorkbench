@@ -2,6 +2,7 @@
 #include "osghelper.h"
 #include <iostream>
 
+
 QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
       : QOpenGLWidget(parent)
         , _mGraphicsWindow(new osgViewer::GraphicsWindowEmbedded( this->x(), this->y(),
@@ -23,6 +24,19 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         camera->setGraphicsContext( _mGraphicsWindow );
         _mViewer->setCamera(camera);
 
+        //intitalize hud
+        osg::ref_ptr<osg::Camera> hud_camera = new osg::Camera;
+        hud_camera->setProjectionMatrix(osg::Matrix::ortho2D(0,1280,0,1024));// set the view matrix
+        hud_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+        hud_camera->setViewMatrix(osg::Matrix::identity());// only clear the depth buffer
+        hud_camera->setClearMask(GL_DEPTH_BUFFER_BIT);// draw subgraph after main camera view.
+        hud_camera->setRenderOrder(osg::Camera::POST_RENDER);
+
+        hud_camera->addChild(createHud());
+        hud_camera->setGraphicsContext(_mGraphicsWindow);
+        hud_camera->setViewport(this->x(), this->y(),this->width(), this->height());
+
+        _mViewer->addSlave(hud_camera, false);
         //trackball navigation
         osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
         manipulator->setAllowThrow( false );
@@ -30,6 +44,7 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         _mViewer->setCameraManipulator(manipulator);
 
         osg::ref_ptr<osg::Group> root = new osg::Group;
+       // root->addChild(hud_camera);
         _mViewer->setSceneData(root);
         _mViewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
@@ -77,7 +92,7 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 
       //basic shader setup
       // disabled shader as of now, but in essence this is how it will work
-//       osg::ref_ptr<osg::StateSet> stateSet = this->getScene()->getOrCreateStateSet();
+      // osg::ref_ptr<osg::StateSet> stateSet = this->getScene()->getOrCreateStateSet();
 //       osg::ref_ptr<osg::Program> program = new osg::Program;
 
 //       osg::ref_ptr<osg::Shader> vertShader = new osg::Shader(osg::Shader::VERTEX);
@@ -103,6 +118,12 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 //       stateSet->addUniform(modelViewProjectionMatrix);
   }
 
+  void QtOSGWidget::addHud(osg::Group hud)
+  {
+      hud_camera->addChild(hud);
+      hud_camera->setGraphicsContext(_mGraphicsWindow);
+      hud_camera->setViewport(this->x(), this->y(),this->width(), this->height());
+  }
   void QtOSGWidget::mouseMoveEvent(QMouseEvent* event)
   {
       this->getEventQueue()->mouseMotion(event->x()*m_scaleX, event->y()*m_scaleY);
@@ -221,6 +242,7 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 
   void QtOSGWidget::openScene(std::string path)
   {
+      //the commented out code is to load osg file
       /*osg::ref_ptr<osg::Node> loadedModel = osgDB::readRefNodeFile(path);
       if(loadedModel == NULL)
       {

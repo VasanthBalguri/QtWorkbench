@@ -3,7 +3,7 @@
 using namespace osg;
 
 //need to be removed
-ref_ptr<Group> createScene()
+osg::Group* createScene()
 {
     osg::ref_ptr<osg::Cylinder> cylinder    = new osg::Cylinder( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f, 0.5f );
     osg::ref_ptr<osg::ShapeDrawable> sd = new osg::ShapeDrawable( cylinder );
@@ -20,12 +20,11 @@ ref_ptr<Group> createScene()
     stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
     stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
 
-    return root;
+    return root.release();
 }
 
 //sample code to create bottle in osg, will remove it later
-TopoDS_Shape
-MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
+TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
            const Standard_Real myThickness)
 {
   // Profile : Define Support Points
@@ -162,7 +161,7 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
 }
 
 //function to convert opencascade shape to osg geometry
-osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geomColor, gp_Trsf& transformation)
+osg::Geometry* createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geomColor, gp_Trsf& transformation)
 {
     // vector to save vertices
     osg::ref_ptr<osg::Vec3Array> vertexList = new osg::Vec3Array();
@@ -286,10 +285,10 @@ osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const o
         osgUtil::SmoothingVisitor::  smooth(*geom,osg::PI/6.0);
     }
 
-    return geom;
+    return geom.release();
 }
 
-osg::ref_ptr<osg::Geode> readStepFile(std::string path)
+osg::Geode* readStepFile(std::string path)
 {
     STEPControl_Reader aReader;
     TopoDS_Shape aShape;
@@ -322,17 +321,38 @@ osg::ref_ptr<osg::Geode> readStepFile(std::string path)
         }
     }
 
-    osg::ref_ptr<osg::StateSet> stateSet = geode->getOrCreateStateSet();
+           osg::ref_ptr<osg::StateSet> stateSet = geode->getOrCreateStateSet();
+        
+//           osg::ref_ptr<osg::Program> program = new osg::Program;
+
+//           osg::ref_ptr<osg::Shader> vertShader = new osg::Shader(osg::Shader::VERTEX);
+//           if (!vertShader->loadShaderSourceFromFile("../shaders/myShader.vert"))
+//               std::cerr << "Could not read VERTEX shader from file" << std::endl;
+//           program->addShader(vertShader);
+
+//            osg::ref_ptr<osg::Shader> geomShader = new osg::Shader(osg::Shader::GEOMETRY);
+//           if (!geomShader->loadShaderSourceFromFile("../shaders/myShader.geom"))
+//               std::cerr << "Could not read GEOM shader from file" << std::endl;
+//           program->addShader(geomShader);
+
+//           osg::ref_ptr<osg::Shader> fragShader = new osg::Shader(osg::Shader::FRAGMENT);
+//           if (!fragShader->loadShaderSourceFromFile("../shaders/myShader.frag"))
+//               std::cerr << "Could not read FRAGMENT shader from file" << std::endl;
+//           program->addShader(fragShader);
+
+//           stateSet->setAttributeAndModes(program.get(), osg::StateAttribute::ON);
+//           stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+
     osg::ref_ptr<osg::Material> material = new osg::Material;
     material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
     stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
     stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
 
-    return geode;
+    return geode.release();
 }
 
 //must be clubbed as a single class instead of helper functions
-osg::ref_ptr<osg::Geode> createBottle(double width,double height,double thickness,const osg::Vec3f& geomColor/*,const osg::Matrixd& viewMatrix*/)
+osg::Geode* createBottle(double width,double height,double thickness,const osg::Vec3f& geomColor/*,const osg::Matrixd& viewMatrix*/)
 {
     gp_Trsf transform;
 
@@ -348,5 +368,5 @@ osg::ref_ptr<osg::Geode> createBottle(double width,double height,double thicknes
     material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
     stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
     stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
-    return geode;
+    return geode.release();
 }

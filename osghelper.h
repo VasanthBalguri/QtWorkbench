@@ -13,7 +13,9 @@
 #include <osgGA/TrackballManipulator>
 #include <osgDB/ReadFile>
 #include <osgUtil/SmoothingVisitor>
-
+#include <osgText/Text>
+#include <osgText/Font>
+#include <osg/BoundingBox>
 //oce includes
 #include <BRep_Tool.hxx>
 #include <BRepTools.hxx>
@@ -100,29 +102,15 @@
 # include <StepBasic_ProductDefinition.hxx>
 # include <StepBasic_ProductDefinitionFormation.hxx>
 
-osg::ref_ptr<osg::Group> createScene();
-TopoDS_Shape
-MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
-           const Standard_Real myThickness);
-osg::ref_ptr<osg::Geometry> createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geomColor, gp_Trsf& transformation);
-osg::ref_ptr<osg::Group> readSceneFile(std::string filePath);
-osg::ref_ptr<osg::Geode> createBottle(double width, double height, double thickness, const osg::Vec3f &geomColor/*, const Matrixd &viewMatrix*/);
-osg::ref_ptr<osg::Geode> readStepFile(std::string path);
-/*namespace OsgOpencascadeHelper{
-
-class Shape{
-
-    Shape(TopoDS_Shape shape)
-    {
-
-    }
-
-};
-
-class Assembly{
-
-};
-
-}*/
+osg::Group* createScene();
+osg::Geode* createHud();
+TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
+                        const Standard_Real myThickness);
+osg::Geometry* createGeometryFromShape(TopoDS_Shape& shape,
+                                                    const osg::Vec3& geomColor, gp_Trsf& transformation);
+osg::Group* readSceneFile(std::string filePath);
+osg::Geode* createBottle(double width, double height, double thickness,
+                                      const osg::Vec3f &geomColor/*, const Matrixd &viewMatrix*/);
+osg::Geode* readStepFile(std::string path);
 
 #endif // OSGHELPER_H

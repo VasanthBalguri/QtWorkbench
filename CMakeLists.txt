@@ -13,7 +13,7 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 find_package(OCE REQUIRED)
-FIND_PACKAGE( OpenSceneGraph COMPONENTS osgDB osgGA osgViewer osg osgUtil)
+FIND_PACKAGE( OpenSceneGraph COMPONENTS osgDB osgGA osgViewer osg osgUtil osgText)
 
 include_directories(${OCE_INCLUDE_DIRS})
 
