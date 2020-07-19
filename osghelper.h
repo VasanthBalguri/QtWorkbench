@@ -103,7 +103,7 @@
 # include <StepBasic_ProductDefinitionFormation.hxx>
 
 osg::Group* createScene();
-osg::Geode* createHud();
+
 TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
                         const Standard_Real myThickness);
 osg::Geometry* createGeometryFromShape(TopoDS_Shape& shape,
