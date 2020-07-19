@@ -32,7 +32,6 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         hud_camera->setClearMask(GL_DEPTH_BUFFER_BIT);// draw subgraph after main camera view.
         hud_camera->setRenderOrder(osg::Camera::POST_RENDER);
 
-        hud_camera->addChild(createHud());
         hud_camera->setGraphicsContext(_mGraphicsWindow);
         hud_camera->setViewport(this->x(), this->y(),this->width(), this->height());
 
