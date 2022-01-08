@@ -14,8 +14,8 @@ endif()
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 find_package(OCE REQUIRED)
 FIND_PACKAGE( OpenSceneGraph COMPONENTS osgDB osgGA osgViewer osg osgUtil osgText)
-
-include_directories(${OCE_INCLUDE_DIRS})
+find_package(Boost REQUIRED)
+include_directories(${OCE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_executable(Qtworkbench
     mainwindow.ui

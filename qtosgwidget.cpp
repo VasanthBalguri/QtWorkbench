@@ -1,7 +1,8 @@
 #include "qtosgwidget.h"
 #include "osghelper.h"
 #include <iostream>
-
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
 QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
       : QOpenGLWidget(parent)
@@ -24,6 +25,8 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         camera->setGraphicsContext( _mGraphicsWindow );
         _mViewer->setCamera(camera);
 
+
+        
         //intitalize hud
         osg::ref_ptr<osg::Camera> hud_camera = new osg::Camera;
         hud_camera->setProjectionMatrix(osg::Matrix::ortho2D(0,1280,0,1024));// set the view matrix
@@ -42,6 +45,13 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
         this->setMouseTracking(true);
         _mViewer->setCameraManipulator(manipulator);
 
+        
+                osg::Vec3d eye( 60.0, 40.0, 60.0 );
+        osg::Vec3d center( 0.0, 0.0, 0.0 );
+        osg::Vec3d up( 0.0, 1.0, 0.0 );
+
+        manipulator->setHomePosition(eye,center,up);
+        
         osg::ref_ptr<osg::Group> root = new osg::Group;
        // root->addChild(hud_camera);
         _mViewer->setSceneData(root);
@@ -117,12 +127,12 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 //       stateSet->addUniform(modelViewProjectionMatrix);
   }
 
-  void QtOSGWidget::addHud(osg::Group hud)
+  /*void QtOSGWidget::addHud(osg::Group hud)
   {
       hud_camera->addChild(hud);
       hud_camera->setGraphicsContext(_mGraphicsWindow);
       hud_camera->setViewport(this->x(), this->y(),this->width(), this->height());
-  }
+  }*/
   void QtOSGWidget::mouseMoveEvent(QMouseEvent* event)
   {
       this->getEventQueue()->mouseMotion(event->x()*m_scaleX, event->y()*m_scaleY);
@@ -241,29 +251,33 @@ void QtOSGWidget::setScale(qreal X, qreal Y)
 
   void QtOSGWidget::openScene(std::string path)
   {
-      //the commented out code is to load osg file
-      /*osg::ref_ptr<osg::Node> loadedModel = osgDB::readRefNodeFile(path);
-      if(loadedModel == NULL)
+
+      if(boost::ends_with(path,".osg"))
       {
-         std::cout<<"failed to load model";
-         throw std::exception();
-       }
+        osg::ref_ptr<osg::Node> loadedModel = osgDB::readRefNodeFile(path);
+        if(loadedModel == NULL)
+          {
+             std::cout<<"failed to load model";
+             throw std::exception();
+          }
 
-       osg::ref_ptr<osg::Group> root = new osg::Group();
-      root->addChild(loadedModel);
+          osg::ref_ptr<osg::Group> root = new osg::Group();
+          root->addChild(loadedModel);
 
-       _mViewer->setSceneData(root);*/
-
-      osg::ref_ptr<osg::Geode> loadedModel = readStepFile(path);
-      if(loadedModel == NULL)
+          _mViewer->setSceneData(root);
+      }else if(boost::ends_with(path,".step"))
       {
-         std::cout<<"failed to load model";
-         throw std::exception();
-       }
-      osg::ref_ptr<osg::Group> root = new osg::Group();
-       root->addChild(loadedModel);
+          osg::ref_ptr<osg::Geode> loadedModel = readStepFile(path);
+          if(loadedModel == NULL)
+          {
+             std::cout<<"failed to load model";
+             throw std::exception();
+           }
+          osg::ref_ptr<osg::Group> root = new osg::Group();
+           root->addChild(loadedModel);
 
-      _mViewer->setSceneData(root);
+          _mViewer->setSceneData(root);
+      }
 
   }
 

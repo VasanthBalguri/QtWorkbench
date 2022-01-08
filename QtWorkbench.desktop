@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=QtWorkbench
+GenericName=QtWorkbench
+Comment=QtWorkbench
+Exec=Qtworkbench
+Icon=QtWorkbench
+Terminal=false
+Type=Application

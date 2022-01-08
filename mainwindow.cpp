@@ -10,8 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     qOsg = new QtOSGWidget(1,1,this);
     ui->setupUi(this);
     ui->verticalLayout_2->addWidget(qOsg);
-
-
+    this->setWindowTitle(QString("Qt osg step Viewer"));
+    resize(1024,768);
     connect(qOsg,SIGNAL(orientationChanged(std::vector<double>)),this,SLOT(changedOrientation(std::vector<double>)));
     connect(this,SIGNAL(colorChanged(QColor)),qOsg,SLOT(changedColor(QColor)));
     connect(this,SIGNAL(openFile(std::string)),qOsg,SLOT(openScene(std::string)));
@@ -80,16 +80,20 @@ void MainWindow::createFileDialog()
 
     QStringList fileNames;
     if (fileDialog.exec())
-        fileNames = fileDialog.selectedFiles();
+        if(fileDialog.selectedFiles().size() != 0)
+        {
+            fileNames = fileDialog.selectedFiles();
+            QString filePath = fileNames.first();
+            emit openFile(std::string(filePath.toUtf8().constData()));
+        }
 
-     QString filePath = fileNames.first();
-    emit openFile(std::string(filePath.toUtf8().constData()));
+
 }
 
 void MainWindow::saveFileDialog()
 {
     QFileDialog fileDialog(this);
-
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
     fileDialog.setFileMode(QFileDialog::AnyFile);
     fileDialog.setViewMode(QFileDialog::Detail);
 

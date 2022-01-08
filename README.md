@@ -2,25 +2,31 @@
 
 Created for qt learning purpose
 
-steps:
+prequesites:
+install opencascade, openscenegraph and qt
+
+sudo apt-get install build-essential oce openscenegraph qt5-default boost
+
+build steps:
 
 * create bin directory
 * go to bin directory
 * run cmake ..
 * run make
+* Qtworkbench executable will be generated in build folder
 
-hope it should work..
+Create appimage:
+* run appbuild.sh
+
 
 # Current usage
 
-* Added shaders to render the object
 * Added sources from Opencascade tutorial to create bottle(should be removed)
-* There is feature to open .osg files
+* There is a feature to open .step files
 
 # Screenshots
 ![Alt text](/screenshots/sample1.png?raw=true "Opencascade Bottle")
 ![Alt text](/screenshots/sample2.png?raw=true "osg file")
 # note:
 
-* .pro file doesnt work as I was unable to configure the opencascade libraries
 * Need to test CMake build on windows to confirm cross compatibility

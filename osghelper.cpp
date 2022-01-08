@@ -281,8 +281,8 @@ osg::Geometry* createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geo
         //geom->setNormalArray(normalArray.get());
         //geom->setVertexAttribArray(1, geom->getNormalArray(), osg::Array::BIND_PER_VERTEX);
         geom->addPrimitiveSet(triangleStrip.get());
-        osgUtil::SmoothingVisitor::smooth(*geom);
-        osgUtil::SmoothingVisitor::  smooth(*geom,osg::PI/6.0);
+        //osgUtil::SmoothingVisitor::smooth(*geom);
+        osgUtil::SmoothingVisitor::smooth(*geom,osg::PI/6.0);
     }
 
     return geom.release();
