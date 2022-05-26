@@ -111,7 +111,11 @@ TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeigh
 
   TopTools_ListOfShape facesToRemove;
   facesToRemove.Append(faceToRemove);
-  myBody = BRepOffsetAPI_MakeThickSolid(myBody, facesToRemove, -myThickness / 50, 1.e-3);
+  //myBody = BRepOffsetAPI_MakeThickSolid(myBody, facesToRemove, -myThickness / 50, 1.e-3);
+  BRepOffsetAPI_MakeThickSolid aSolidMaker;
+  aSolidMaker.MakeThickSolidByJoin(myBody, facesToRemove, -myThickness / 50, 1.e-3);
+  myBody = aSolidMaker.Shape();
+  //myBody = BRepOffsetAPI_MakeThickSolidByJoin(myBody,facesToRemove, -myThickness / 50, 1.e-3,0.01);
   // Threading : Create Surfaces
   Handle(Geom_CylindricalSurface) aCyl1 = new Geom_CylindricalSurface(neckAx2, myNeckRadius * 0.99);
   Handle(Geom_CylindricalSurface) aCyl2 = new Geom_CylindricalSurface(neckAx2, myNeckRadius * 1.05);
@@ -220,7 +224,8 @@ osg::Geometry* createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geo
                 {
                     // populate vertex list
                     // Ref: http://www.opencascade.org/org/forum/thread_16694/?forum=3
-                    gp_Pnt pt = (triangulation->Nodes())(j).Transformed(transformation * location.Transformation());
+                    gp_Pnt pt = triangulation->Node(j).Transformed(transformation * location.Transformation());
+                    //gp_Pnt pt = (triangulation->Nodes())(j).Transformed(transformation * location.Transformation());
                     vertexList->push_back(osg::Vec3(pt.X(), pt.Y(), pt.Z()));
                    // std::cout<<pt.X()<<"\t"<<pt.Y()<<"\t"<<pt.Z()<<std::endl;
                     // populate color list
@@ -251,10 +256,13 @@ osg::Geometry* createGeometryFromShape(TopoDS_Shape& shape, const osg::Vec3& geo
                         triangles(j).Get(v1, v2, v3);
                     }
 
-                    gp_XYZ aPnt1 = (triangulation->Nodes())(v1).XYZ();
-                    gp_XYZ aPnt2 = (triangulation->Nodes())(v2).XYZ();
-                    gp_XYZ aPnt3 = (triangulation->Nodes())(v3).XYZ();
+                    //gp_XYZ aPnt1 = (triangulation->Nodes())(v1).XYZ();
+                    //gp_XYZ aPnt2 = (triangulation->Nodes())(v2).XYZ();
+                    //gp_XYZ aPnt3 = (triangulation->Nodes())(v3).XYZ();
 
+                    gp_XYZ aPnt1 = triangulation->Node(v1).XYZ();
+                    gp_XYZ aPnt2 = triangulation->Node(v2).XYZ();
+                    gp_XYZ aPnt3 = triangulation->Node(v3).XYZ();
 //                    gp_XYZ aV12 = aPnt2 - aPnt1;
 //                    gp_XYZ aV23 = aPnt3 - aPnt2;
 //                    gp_XYZ aNor = aV12^aV23;
